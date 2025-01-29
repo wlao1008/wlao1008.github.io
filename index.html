@@ -141,6 +141,103 @@
             border-radius: 4px;
             font-size: 0.8em;
         }
+        
+        /* 添加侧边告白按钮样式 */
+        .love-button {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 182, 193, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 25px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .love-button:hover {
+            transform: translateY(-50%) scale(1.05);
+            background: rgba(255, 182, 193, 0.4);
+        }
+
+        /* 告白弹框样式 */
+        .love-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .love-modal {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .love-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .love-modal-overlay.active .love-modal {
+            transform: scale(1);
+        }
+
+        .love-message-text {
+            color: white;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .love-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .love-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .love-hearts {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
     </style>
 </head>
 
@@ -218,6 +315,18 @@
 
     <div id="loveMessage" class="love-message hidden"></div>
 
+    <!-- 添加告白按钮 -->
+    <button class="love-button heart-beat">想对你说 💌</button>
+
+    <!-- 添加告白弹框 -->
+    <div class="love-modal-overlay" id="loveModal">
+        <div class="love-modal">
+            <div class="love-hearts"></div>
+            <p class="love-message-text" id="loveModalText"></p>
+            <button class="love-modal-close">关闭 💕</button>
+        </div>
+    </div>
+
     <script>
         // 添加有效口令数组
         const validPasswords = ['0804', '19990804', 'imissu', 'iloveu', 'xiangni', 'aini', 'maomaoiloveu'];
@@ -284,7 +393,7 @@
 
         // 计算恋爱天数
         function calculateLoveDays() {
-            const startDate = new Date('2024-01-05'); // 设置为你们的恋爱纪念日
+            const startDate = new Date('2025-01-05'); // 设置为你们的恋爱纪念日
             const today = new Date();
             const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
             document.getElementById('togetherDays').innerHTML = 
@@ -297,7 +406,8 @@
                 "想你了呢 💕",
                 "抱抱你 🤗",
                 "亲亲你 😘",
-                "永远爱你 ❤️"
+                "爱你 ❤️",
+                "想立即见你！💗"
             ];
             
             const messageDiv = document.getElementById('loveMessage');
@@ -426,6 +536,7 @@
             calculateLoveDays();
             showRandomLoveMessage();
             checkSpecialDate();
+            initializeLoveModal();
         }
 
         // 页面加载时初始化
@@ -445,6 +556,60 @@
                 <p class="text-white text-lg">${wish.text}</p>
             `;
             wishHistory.insertBefore(card, wishHistory.firstChild);
+        }
+
+        // 修改告白消息数组
+        const loveMessages = [
+            `新年快乐喔！💝
+            
+            简短地写一个，祝你幸福的时候幸福，不幸福的时候有战胜不幸福的勇气～
+            祝你万事顺意～ ✨
+            
+            对我和你来说，感谢你可以让我拥有爱你的机会，希望明年可以继续持续爱你！
+            
+            对于现在的我来说，只想马上见到你喔～ 💕`
+        ];
+
+        // 初始化告白弹框功能
+        function initializeLoveModal() {
+            const button = document.querySelector('.love-button');
+            const modal = document.getElementById('loveModal');
+            const closeButton = modal.querySelector('.love-modal-close');
+            const messageText = document.getElementById('loveModalText');
+
+            button.addEventListener('click', () => {
+                const randomMessage = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+                messageText.innerHTML = randomMessage.replace(/\n/g, '<br>');
+                modal.classList.add('active');
+                createHearts();
+            });
+
+            closeButton.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        // 创建漂浮爱心效果
+        function createHearts() {
+            const heartsContainer = document.querySelector('.love-hearts');
+            heartsContainer.innerHTML = '';
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.style.position = 'absolute';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.opacity = '0.5';
+                heart.style.animation = `float ${3 + Math.random() * 4}s ease-in-out infinite`;
+                heartsContainer.appendChild(heart);
+            }
         }
     </script>
 </body>
