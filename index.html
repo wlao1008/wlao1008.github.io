@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="GBK">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毛币许愿页面</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 60px;
+            /* 为顶部导航栏留出空间 */
+            position: relative;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .glow-effect {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+        
+        .wish-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        .wish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+        
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3));
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4));
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <button id="loginBtn" class="glass-card px-6 py-2 rounded-xl text-white font-medium hover:bg-white hover:bg-opacity-30 transition-all">
+            登录
+        </button>
+    </div>
+    <div class="container max-w-6xl px-4 py-12">
+        <div class="text-center mb-16">
+            <h1 class="text-6xl font-bold text-white glow-effect mb-6 float-animation">毛币许愿池</h1>
+            <p class="text-white text-2xl opacity-90">用心许愿，梦想成真</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-16 items-start justify-center">
+            <div class="md:w-2/5">
+                <div class="glass-card rounded-3xl p-16 mb-14">
+                    <form class="space-y-10" id="wishForm" onsubmit="return false">
+                        <div>
+                            <label class="block text-white text-xl font-medium mb-4" for="coins">
+                                毛币数量
+                            </label>
+                            <input type="number" id="coins" name="coins" required class="w-full px-6 py-4 rounded-2xl form-input focus:outline-none focus:ring-2 focus:ring-white text-lg" placeholder="请输入毛币数量">
+                        </div>
+                        <div>
+                            <label class="block text-white text-xl font-medium mb-4" for="wish">
+                                许愿内容
+                            </label>
+                            <textarea id="wish" name="wish" required class="w-full px-6 py-4 rounded-2xl form-input focus:outline-none focus:ring-2 focus:ring-white h-56 text-lg" placeholder="写下你的心愿..."></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn w-full text-white py-5 px-8 rounded-2xl text-xl font-bold shadow-lg">
+                            许下心愿
+                        </button>
+                    </form>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 mb-10">
+                    <form class="mb-8" id="addCoinsForm" onsubmit="return false">
+                        <h2 class="text-3xl font-bold text-white mb-6 text-center">增加毛币</h2>
+                        <div class="space-y-6">
+                            <div>
+                                <input type="number" id="addCoins" name="addCoins" required class="w-full px-6 py-4 rounded-2xl form-input focus:outline-none focus:ring-2 focus:ring-white text-lg" placeholder="增加的毛币数量">
+                            </div>
+                            <div>
+                                <input type="password" id="password" name="password" required class="w-full px-6 py-4 rounded-2xl form-input focus:outline-none focus:ring-2 focus:ring-white text-lg" placeholder="请输入口令">
+                            </div>
+                            <button type="submit" class="submit-btn w-full text-white py-4 px-8 rounded-2xl text-xl font-bold shadow-lg">
+                                增加毛币
+                            </button>
+                        </div>
+                    </form>
+                    <h2 class="text-3xl font-bold text-white mb-8 text-center">实时统计</h2>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="stat-card p-6 rounded-2xl text-center">
+                            <p class="text-white font-bold text-4xl mb-3" id="totalWishes">0</p>
+                            <p class="text-white opacity-90 text-lg">总心愿</p>
+                        </div>
+                        <div class="stat-card p-6 rounded-2xl text-center">
+                            <p class="text-white font-bold text-4xl mb-3" id="totalCoins">0</p>
+                            <p class="text-white opacity-90 text-lg">总毛币</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:w-2/5">
+                <h2 class="text-3xl font-bold text-white mb-8">历史心愿</h2>
+                <div id="wishHistory" class="space-y-6">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        let wishes = JSON.parse(localStorage.getItem('wishes') || '[]');
+        let totalCoins = parseInt(localStorage.getItem('totalCoins') || '0');
+        let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+        // 更新统计数据
+        function updateStats() {
+            document.getElementById('totalWishes').textContent = wishes.length;
+            document.getElementById('totalCoins').textContent = totalCoins;
+        }
+
+        // 更新登录状态
+        function updateLoginStatus() {
+            const loginBtn = document.getElementById('loginBtn');
+            if (isLoggedIn) {
+                loginBtn.textContent = '退出登录';
+            } else {
+                loginBtn.textContent = '登录';
+            }
+        }
+
+        // 登录/退出功能
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            if (isLoggedIn) {
+                isLoggedIn = false;
+                localStorage.setItem('isLoggedIn', 'false');
+                updateLoginStatus();
+                return;
+            }
+
+            const password = prompt('请输入登录密码：');
+            if (password === '19941008') { // 这里设置您的登录密码
+                isLoggedIn = true;
+                localStorage.setItem('isLoggedIn', 'true');
+                alert('登录成功！');
+                updateLoginStatus();
+            } else {
+                alert('密码错误！');
+            }
+        });
+
+        // 许愿功能
+        document.getElementById('wishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!isLoggedIn) {
+                alert('请先登录！');
+                return;
+            }
+
+            const coinsInput = document.getElementById('coins');
+            const wishInput = document.getElementById('wish');
+            const coins = parseInt(coinsInput.value);
+            const wishText = wishInput.value.trim();
+
+            if (coins <= 0) {
+                alert('毛币数量必须大于0！');
+                return;
+            }
+
+            if (coins > totalCoins) {
+                alert('毛币数量不足！');
+                return;
+            }
+
+            const newWish = {
+                coins: coins,
+                text: wishText,
+                date: new Date().toISOString()
+            };
+
+            wishes.unshift(newWish);
+            totalCoins -= coins;
+
+            localStorage.setItem('wishes', JSON.stringify(wishes));
+            localStorage.setItem('totalCoins', totalCoins);
+
+            addWishCard(newWish);
+            updateStats();
+
+            coinsInput.value = '';
+            wishInput.value = '';
+
+            alert('许愿成功！');
+        });
+
+        // 增加毛币功能
+        document.getElementById('addCoinsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!isLoggedIn) {
+                alert('请先登录！');
+                return;
+            }
+
+            const addCoinsInput = document.getElementById('addCoins');
+            const passwordInput = document.getElementById('password');
+            const coinsToAdd = parseInt(addCoinsInput.value);
+            const password = passwordInput.value;
+
+            if (password !== 'admin123') { // 这里设置增加毛币的密码
+                alert('口令错误！');
+                return;
+            }
+
+            if (coinsToAdd <= 0) {
+                alert('增加的毛币数量必须大于0！');
+                return;
+            }
+
+            totalCoins += coinsToAdd;
+            localStorage.setItem('totalCoins', totalCoins);
+            updateStats();
+
+            addCoinsInput.value = '';
+            passwordInput.value = '';
+
+            alert('毛币增加成功！');
+        });
+
+        // 初始化页面
+        function initializePage() {
+            updateStats();
+            updateLoginStatus();
+            wishes.forEach(addWishCard);
+        }
+
+        // 页面加载时初始化
+        initializePage();
+
+        function addWishCard(wish) {
+            const wishHistory = document.getElementById('wishHistory');
+            const card = document.createElement('div');
+            card.className = 'wish-card rounded-2xl p-8 mb-4 shadow-lg';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-white opacity-75 text-base">${new Date(wish.date).toLocaleString()}</span>
+                    <span class="bg-green-500 bg-opacity-20 text-green-800 px-4 py-2 rounded-full text-base font-medium">
+                        ${wish.coins} 毛币
+                    </span>
+                </div>
+                <p class="text-white text-lg">${wish.text}</p>
+            `;
+            wishHistory.insertBefore(card, wishHistory.firstChild);
+        }
+    </script>
+</body>
+
+</html>
