@@ -108,6 +108,39 @@
             background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4));
             transform: translateY(-2px);
         }
+        
+        /* 添加爱心动画 */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .heart-beat {
+            animation: heartbeat 1s infinite;
+        }
+        
+        .love-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(255, 192, 203, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .special-date {
+            background: linear-gradient(45deg, #ff6b6b, #ffc3a0);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 
@@ -119,8 +152,9 @@
     </div>
     <div class="container max-w-6xl px-4 py-12">
         <div class="text-center mb-16">
-            <h1 class="text-6xl font-bold text-white glow-effect mb-6 float-animation">毛币许愿池</h1>
-            <p class="text-white text-2xl opacity-90">用心许愿，梦想成真</p>
+            <h1 class="text-6xl font-bold text-white glow-effect mb-6 float-animation">毛币许愿池 ❤️</h1>
+            <p class="text-white text-2xl opacity-90" id="loveQuote">用心许愿，梦想成真</p>
+            <p class="text-white text-xl mt-4" id="togetherDays"></p>
         </div>
 
         <div class="flex flex-col md:flex-row gap-16 items-start justify-center">
@@ -182,7 +216,12 @@
         </div>
     </div>
 
+    <div id="loveMessage" class="love-message hidden"></div>
+
     <script>
+        // 添加有效口令数组
+        const validPasswords = ['0804', '19990804', 'imissu', 'iloveu', 'xiangni', 'aini', 'maomaoiloveu'];
+        
         // 初始化数据
         let wishes = JSON.parse(localStorage.getItem('wishes') || '[]');
         let totalCoins = parseInt(localStorage.getItem('totalCoins') || '0');
@@ -198,7 +237,7 @@
         function updateLoginStatus() {
             const loginBtn = document.getElementById('loginBtn');
             if (isLoggedIn) {
-                loginBtn.textContent = '退出登录';
+                loginBtn.textContent = '欢迎您，毛毛酱🫰';
             } else {
                 loginBtn.textContent = '登录';
             }
@@ -223,6 +262,81 @@
                 alert('密码错误！');
             }
         });
+
+        // 添加随机甜蜜话数组
+        const loveQuotes = [
+            "今天也很想你呢 ❤️",
+            "你就是我最大的心愿 💝",
+            "有你的每一天都很特别 ✨",
+            "我们要一直一直在一起哦 💑",
+            "你是我最重要的人 💖",
+            "遇见你是我最大的幸运 🍀"
+        ];
+
+        // 随机显示甜蜜话
+        function showRandomLoveQuote() {
+            const quoteElement = document.getElementById('loveQuote');
+            setInterval(() => {
+                const randomQuote = loveQuotes[Math.floor(Math.random() * loveQuotes.length)];
+                quoteElement.textContent = randomQuote;
+            }, 5000);
+        }
+
+        // 计算恋爱天数
+        function calculateLoveDays() {
+            const startDate = new Date('2024-01-05'); // 设置为你们的恋爱纪念日
+            const today = new Date();
+            const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('togetherDays').innerHTML = 
+                `我们已经做题 <span class="special-date heart-beat">第 ${days} 天</span> 啦 💑`;
+        }
+
+        // 随机弹出爱心消息
+        function showRandomLoveMessage() {
+            const messages = [
+                "想你了呢 💕",
+                "抱抱你 🤗",
+                "亲亲你 😘",
+                "永远爱你 ❤️"
+            ];
+            
+            const messageDiv = document.getElementById('loveMessage');
+            
+            setInterval(() => {
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                messageDiv.textContent = randomMessage;
+                messageDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 3000);
+            }, 30000);
+        }
+
+        // 特殊日期提醒
+        function checkSpecialDate() {
+            const today = new Date();
+            const specialDates = {
+                '01-05': '我们的澳门做题纪念日 💑！',
+                // 在这里添加更多特殊日期
+            };
+
+            const dateKey = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            if (specialDates[dateKey]) {
+                alert(`今天是${specialDates[dateKey]}！❤️`);
+            }
+        }
+
+        // 修改许愿成功的提示
+        function showLovelyWishSuccess() {
+            const messages = [
+                "心愿已经收到啦，一定会实现的哦 ❤️",
+                "你的愿望我都记在心里啦 💖",
+                "我会努力实现你的愿望的 💝",
+                "收到你的心愿啦，超级开心 ✨"
+            ];
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
 
         // 许愿功能
         document.getElementById('wishForm').addEventListener('submit', function(e) {
@@ -266,10 +380,10 @@
             coinsInput.value = '';
             wishInput.value = '';
 
-            alert('许愿成功！');
+            alert(showLovelyWishSuccess());
         });
 
-        // 增加毛币功能
+        // 修改增加毛币功能中的密码验证部分
         document.getElementById('addCoinsForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -283,7 +397,7 @@
             const coinsToAdd = parseInt(addCoinsInput.value);
             const password = passwordInput.value;
 
-            if (password !== 'admin123') { // 这里设置增加毛币的密码
+            if (!validPasswords.includes(password)) { // 检查密码是否在有效密码数组中
                 alert('口令错误！');
                 return;
             }
@@ -308,6 +422,10 @@
             updateStats();
             updateLoginStatus();
             wishes.forEach(addWishCard);
+            showRandomLoveQuote();
+            calculateLoveDays();
+            showRandomLoveMessage();
+            checkSpecialDate();
         }
 
         // 页面加载时初始化
