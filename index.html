@@ -372,25 +372,6 @@
             }
         });
 
-        // 添加随机甜蜜话数组
-        const loveQuotes = [
-            "今天也很想你呢 ❤️",
-            "你就是我最大的心愿 💝",
-            "有你的每一天都很特别 ✨",
-            "我们要一直一直在一起哦 💑",
-            "你是我最重要的人 💖",
-            "遇见你是我最大的幸运 🍀"
-        ];
-
-        // 随机显示甜蜜话
-        function showRandomLoveQuote() {
-            const quoteElement = document.getElementById('loveQuote');
-            setInterval(() => {
-                const randomQuote = loveQuotes[Math.floor(Math.random() * loveQuotes.length)];
-                quoteElement.textContent = randomQuote;
-            }, 5000);
-        }
-
         // 计算恋爱天数
         function calculateLoveDays() {
             const startDate = new Date('2025-01-05'); // 设置为你们的恋爱纪念日
@@ -398,29 +379,6 @@
             const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
             document.getElementById('togetherDays').innerHTML = 
                 `我们已经做题 <span class="special-date heart-beat">第 ${days} 天</span> 啦 💑`;
-        }
-
-        // 随机弹出爱心消息
-        function showRandomLoveMessage() {
-            const messages = [
-                "想你了呢 💕",
-                "抱抱你 🤗",
-                "亲亲你 😘",
-                "爱你 ❤️",
-                "想立即见你！💗"
-            ];
-            
-            const messageDiv = document.getElementById('loveMessage');
-            
-            setInterval(() => {
-                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                messageDiv.textContent = randomMessage;
-                messageDiv.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    messageDiv.classList.add('hidden');
-                }, 3000);
-            }, 30000);
         }
 
         // 特殊日期提醒
@@ -443,9 +401,55 @@
                 "心愿已经收到啦，一定会实现的哦 ❤️",
                 "你的愿望我都记在心里啦 💖",
                 "我会努力实现你的愿望的 💝",
-                "收到你的心愿啦，超级开心 ✨"
+                "收到你的心愿啦，超级开心 ✨",
+                "你的每个愿望都是我的使命 🌟"
             ];
             return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        // 添加随机甜蜜话数组
+        const loveQuotes = [
+            "今天也很想你呢 ❤️",
+            "你就是我最大的心愿 💝",
+            "有你的每一天都很特别 ✨",
+            "我们要一直一直在一起哦 💑",
+            "你是我最重要的人 💖",
+            "遇见你是我最大的幸运 🍀",
+            "每天都想和你一起学习 📚",
+            "和你一起做题真的很开心 ✏️",
+            "你是我最棒的学习搭档 💫"
+        ];
+
+        // 随机显示甜蜜话
+        function showRandomLoveQuote() {
+            const quoteElement = document.getElementById('loveQuote');
+            setInterval(() => {
+                const randomQuote = loveQuotes[Math.floor(Math.random() * loveQuotes.length)];
+                quoteElement.textContent = randomQuote;
+            }, 5000);
+        }
+
+        // 随机弹出爱心消息
+        function showRandomLoveMessage() {
+            const messages = [
+                "想你了呢 💕",
+                "抱抱你 🤗",
+                "亲亲你 😘",
+                "爱你 ❤️",
+                "想立即见你！💗"
+            ];
+            
+            const messageDiv = document.getElementById('loveMessage');
+            
+            setInterval(() => {
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                messageDiv.textContent = randomMessage;
+                messageDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 3000);
+            }, 3001);
         }
 
         // 许愿功能
