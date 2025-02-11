@@ -685,11 +685,11 @@
         function updateSpecialDates() {
             const { nearestHoliday, daysUntilHoliday } = getNextHoliday();
             const holidayElement = document.getElementById('specialHoliday');
-            holidayElement.textContent = `离最近的节日（${nearestHoliday}）还有 ${daysUntilHoliday} 天！`;
+            holidayElement.innerHTML = `离最近的节日（${nearestHoliday}）还有 ${daysUntilHoliday} 天！`;
     
             const meetingElement = document.getElementById('daysUntilMeeting');
             const daysUntilMeeting = getDaysUntilMeeting();
-            meetingElement.textContent = `离见面还有 ${daysUntilMeeting} 天！`;
+            meetingElement.innerHTML = `离见面还有 ${daysUntilMeeting} 天！`;
         }
     </script>
 </body>
