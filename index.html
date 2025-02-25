@@ -774,7 +774,7 @@
             if (daysUntilMeeting >= 0) {
                 meetingElement.innerHTML = `离见面还有 <span id="meetingDays" class="countdown-effect">${daysUntilMeeting}</span> 天！`;
             } else {
-                meetingElement.innerHTML = `离见面还有 <span id="meetingDays" class="countdown-effect">∞</span> 天！后会无期！`;
+                meetingElement.innerHTML = `离见面还有 <span id="meetingDays" class="countdown-effect" style="color: red;">∞</span> 天！后会无期！`;
             }
         
             // 添加动态效果
