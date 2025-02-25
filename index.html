@@ -451,15 +451,22 @@
         const meetingDate = new Date('2025-02-21'); // 见面的日期（例如2025年3月1日）
         
         // 初始化数据
-        let wishes = JSON.parse(localStorage.getItem('wishes') || '[]');
-        let totalCoins = parseInt(localStorage.getItem('totalCoins') || '0');
         let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
         // 更新统计数据
         function updateStats() {
-            document.getElementById('totalWishes').textContent = wishes.length;
-            document.getElementById('totalCoins').textContent = totalCoins;
+            firebase.database().ref('wishes').on('value', (snapshot) => {
+                const wishes = snapshot.val();
+                const totalWishes = wishes ? Object.keys(wishes).length : 0;
+                document.getElementById('totalWishes').textContent = totalWishes;
+            });
+        
+            firebase.database().ref('totalCoins').on('value', (snapshot) => {
+                const totalCoins = snapshot.val() || 0;
+                document.getElementById('totalCoins').textContent = totalCoins;
+            });
         }
+
 
         // 更新登录状态
         function updateLoginStatus() {
@@ -569,97 +576,108 @@
         }
 
         // 许愿功能
-        document.getElementById('wishForm').addEventListener('submit', function(e) {
+       document.getElementById('wishForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+        
             if (!isLoggedIn) {
                 alert('请先登录！');
                 return;
             }
-
+        
             const coinsInput = document.getElementById('coins');
             const wishInput = document.getElementById('wish');
             const coins = parseInt(coinsInput.value);
             const wishText = wishInput.value.trim();
-
+        
             if (coins <= 0) {
                 alert('毛币数量必须大于0！');
                 return;
             }
-
-            if (coins > totalCoins) {
-                alert('毛币数量不足！');
-                return;
-            }
-
-            const newWish = {
-                coins: coins,
-                text: wishText,
-                date: new Date().toISOString()
-            };
-
-            wishes.unshift(newWish);
-            totalCoins -= coins;
-
-            localStorage.setItem('wishes', JSON.stringify(wishes));
-            localStorage.setItem('totalCoins', totalCoins);
-
-            addWishCard(newWish);
-            updateStats();
-
-            coinsInput.value = '';
-            wishInput.value = '';
-
-            alert(showLovelyWishSuccess());
+        
+            // 从 Firebase 获取当前总毛币数
+            firebase.database().ref('totalCoins').once('value').then((snapshot) => {
+                const currentTotalCoins = snapshot.val() || 0;
+                if (coins > currentTotalCoins) {
+                    alert('毛币数量不足！');
+                    return;
+                }
+        
+                const newWish = {
+                    coins: coins,
+                    text: wishText,
+                    date: new Date().toISOString()
+                };
+        
+                // 存储许愿到 Firebase
+                firebase.database().ref('wishes').push(newWish)
+                    .then(() => {
+                        // 更新总毛币数
+                        const updatedTotalCoins = currentTotalCoins - coins;
+                        firebase.database().ref('totalCoins').set(updatedTotalCoins)
+                            .then(() => {
+                                coinsInput.value = '';
+                                wishInput.value = '';
+                                alert(showLovelyWishSuccess());
+                            });
+                    })
+                    .catch(err => alert('许愿失败：' + err.message));
+            });
         });
+
 
         // 修改增加毛币功能中的密码验证部分
         document.getElementById('addCoinsForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
+        
             if (!isLoggedIn) {
                 alert('请先登录！');
                 return;
             }
-
+        
             const addCoinsInput = document.getElementById('addCoins');
             const passwordInput = document.getElementById('password');
             const coinsToAdd = parseInt(addCoinsInput.value);
             const password = passwordInput.value;
-
-            if (!validPasswords.includes(password)) { // 检查密码是否在有效密码数组中
+        
+            if (!validPasswords.includes(password)) {
                 alert('口令错误！');
                 return;
             }
-
+        
             if (coinsToAdd <= 0) {
                 alert('增加的毛币数量必须大于0！');
                 return;
             }
-
-            totalCoins += coinsToAdd;
-            localStorage.setItem('totalCoins', totalCoins);
-            updateStats();
-
-            addCoinsInput.value = '';
-            passwordInput.value = '';
-
-            alert('毛币增加成功！');
+        
+            // 从 Firebase 获取当前总毛币数
+            firebase.database().ref('totalCoins').once('value').then((snapshot) => {
+                const currentTotalCoins = snapshot.val() || 0;
+                const updatedTotalCoins = currentTotalCoins + coinsToAdd;
+                firebase.database().ref('totalCoins').set(updatedTotalCoins)
+                    .then(() => {
+                        addCoinsInput.value = '';
+                        passwordInput.value = '';
+                        alert('毛币增加成功！');
+                    })
+                    .catch(err => alert('增加毛币失败：' + err.message));
+            });
         });
+
 
         // 初始化页面
         function initializePage() {
-            updateStats();
             updateLoginStatus();
-            wishes.forEach(addWishCard);
+            displayWishes();
+            updateStats();
             showRandomLoveQuote();
             calculateLoveDays();
             showRandomLoveMessage();
             checkSpecialDate();
             initializeLoveModal();
             updateSpecialDates();
-            displayMeetingDates(); 
+            displayMeetingDates();
         }
+
 
         // 页面加载时初始化
         initializePage();
@@ -800,6 +818,20 @@
                 element.style.transform = 'scale(1)';
             }, 300); // 在动画后恢复原样
         }
+
+        function displayWishes() {
+            const wishHistory = document.getElementById('wishHistory');
+            firebase.database().ref('wishes').on('value', (snapshot) => {
+                wishHistory.innerHTML = ''; // 清空现有卡片
+                const wishes = snapshot.val();
+                if (wishes) {
+                    Object.values(wishes).reverse().forEach((wish) => {
+                        addWishCard(wish);
+                    });
+                }
+            });
+        }
+
 
         // 点击“想见我”按钮存储日期
         document.getElementById('meetMeBtn').addEventListener('click', function() {
