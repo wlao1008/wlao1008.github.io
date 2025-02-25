@@ -310,12 +310,16 @@
             <p id="missYou" class="text-white text-xl mt-4 text-center">
                 <span class="special-date glow-effect heart-beat">很想见你 ❤️</span>
             </p>
-            <button id="meetMeBtn" class="glass-card px-6 py-2 rounded-xl text-white font-medium hover:bg-white hover:bg-opacity-30 transition-all mt-4">
-                想见我
+            <button id="meetMeBtn" class="glass-card px-8 py-4 rounded-2xl text-white font-bold text-2xl hover:bg-white hover:bg-opacity-30 transition-all mt-6 block mx-auto heart-beat">
+                想见我 ❤️
+            </button>
+            <button id="clearMeetingDatesBtn" class="glass-card px-6 py-2 rounded-xl text-white font-medium hover:bg-white hover:bg-opacity-30 transition-all mt-4">
+                清除见面日期【不想见我！】
             </button>
             <div id="meetingDates" class="text-white text-xl mt-4">
                 <!-- 见面日期将显示在这里 -->
             </div>
+
         </div>
 
         <div class="flex flex-col md:flex-row gap-16 items-start justify-center">
@@ -798,7 +802,7 @@
             if (dateInput) {
                 const selectedDate = new Date(dateInput);
                 if (!isNaN(selectedDate)) {
-                    database.ref('meetingDates').push(selectedDate.toISOString())
+                    firebase.database().ref('meetingDates').push(selectedDate.toISOString())
                         .then(() => alert('见面日期已保存！'))
                         .catch(err => alert('保存失败：' + err.message));
                 } else {
@@ -806,17 +810,26 @@
                 }
             }
         });
+
+        // 点击“清除见面日期”按钮
+        document.getElementById('clearMeetingDatesBtn').addEventListener('click', function() {
+            if (confirm('确定要清除所有见面日期吗？')) {
+                firebase.database().ref('meetingDates').remove()
+                    .then(() => alert('见面日期已清除！'))
+                    .catch(err => alert('清除失败：' + err.message));
+            }
+        });
         
         // 实时读取并显示见面日期
         function displayMeetingDates() {
             const meetingDatesDiv = document.getElementById('meetingDates');
-            database.ref('meetingDates').on('value', (snapshot) => {
+            firebase.database().ref('meetingDates').on('value', (snapshot) => {
                 const dates = snapshot.val();
-                if (dates) {
+                if (dates && Object.values(dates).length > 0) {
                     const dateList = Object.values(dates).map(date => new Date(date).toLocaleDateString('zh-CN'));
                     meetingDatesDiv.innerHTML = '我们计划见面的日期：<br>' + dateList.join('<br>');
                 } else {
-                    meetingDatesDiv.innerHTML = '暂无计划见面的日期';
+                    meetingDatesDiv.innerHTML = '毛毛现在不需要海底捞噢 ❤️';
                 }
             });
         }
