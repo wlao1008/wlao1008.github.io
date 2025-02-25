@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>毛币许愿页面</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
     <style>
         body {
             background: linear-gradient(135deg, #43cea2, #185a9d);
@@ -306,6 +309,12 @@
             <p id="missYou" class="text-white text-xl mt-4 text-center">
                 <span class="special-date glow-effect heart-beat">很想见你 ❤️</span>
             </p>
+            <button id="meetMeBtn" class="glass-card px-6 py-2 rounded-xl text-white font-medium hover:bg-white hover:bg-opacity-30 transition-all mt-4">
+                想见我
+            </button>
+            <div id="meetingDates" class="text-white text-xl mt-4">
+                <!-- 见面日期将显示在这里 -->
+            </div>
         </div>
 
         <div class="flex flex-col md:flex-row gap-16 items-start justify-center">
@@ -382,6 +391,25 @@
     </div>
 
     <script>
+
+        // Firebase 配置信息
+        const firebaseConfig = {
+          apiKey: "AIzaSyAKckERQAo9LLHCZNqHE7jO40cDjKrMB48",
+          authDomain: "mmmiss-95643.firebaseapp.com",
+          databaseURL: "https://mmmiss-95643-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "mmmiss-95643",
+          storageBucket: "mmmiss-95643.firebasestorage.app",
+          messagingSenderId: "373810534755",
+          appId: "1:373810534755:web:eb8c16caed26b343119b56",
+          measurementId: "G-CF6T8MP55X"
+        };
+        
+        // 初始化 Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // 获取数据库引用
+        const database = firebase.database();
+
         // 添加有效口令数组
         const validPasswords = ['0804', '19990804', 'imissu', 'iloveu', 'xiangni', 'aini', 'maomaoiloveu'];
 
@@ -625,6 +653,7 @@
             checkSpecialDate();
             initializeLoveModal();
             updateSpecialDates();
+            displayMeetingDates(); 
         }
 
         // 页面加载时初始化
@@ -648,17 +677,10 @@
 
         // 修改告白消息数组
         const loveMessages = [
-            `最爱的毛毛酱，情人节快乐！💝
-        
-            或许这才是属于我们的节日！🎉 
-            不是你和yuanhao的节日哦~（bushi）😉
-        
-            爱上一个人很简单，爱下去很难💖
-            
-            我会继续坚持爱你，至少现在坚定地这么想💪
-        
-            非常期待下周见面！💑 
-            很希望待在你身边，可以和你一起做很多开心的事情🌸`
+            `当你需要我的时候
+            我就会出现呢
+            不需要我的时候
+            我就会 慢慢 消失~`
         ];
 
 
@@ -769,6 +791,34 @@
             }, 300); // 在动画后恢复原样
         }
 
+        // 点击“想见我”按钮存储日期
+        document.getElementById('meetMeBtn').addEventListener('click', function() {
+            const dateInput = prompt('请选择想见面的日期（YYYY-MM-DD）：');
+            if (dateInput) {
+                const selectedDate = new Date(dateInput);
+                if (!isNaN(selectedDate)) {
+                    database.ref('meetingDates').push(selectedDate.toISOString())
+                        .then(() => alert('见面日期已保存！'))
+                        .catch(err => alert('保存失败：' + err.message));
+                } else {
+                    alert('请输入有效的日期！');
+                }
+            }
+        });
+        
+        // 实时读取并显示见面日期
+        function displayMeetingDates() {
+            const meetingDatesDiv = document.getElementById('meetingDates');
+            database.ref('meetingDates').on('value', (snapshot) => {
+                const dates = snapshot.val();
+                if (dates) {
+                    const dateList = Object.values(dates).map(date => new Date(date).toLocaleDateString('zh-CN'));
+                    meetingDatesDiv.innerHTML = '我们计划见面的日期：<br>' + dateList.join('<br>');
+                } else {
+                    meetingDatesDiv.innerHTML = '暂无计划见面的日期';
+                }
+            });
+        }
     </script>
 </body>
 
