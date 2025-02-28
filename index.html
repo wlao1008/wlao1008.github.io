@@ -679,7 +679,8 @@
                 Object.values(photos).forEach(photo => {
                     // 对 URL 进行 URL 编码
                     const encodedUrl = encodeURIComponent(photo.url);
-        
+                    console.log(photo.url);
+                    console.log(encodedUrl);
                     const photoElement = document.createElement('div');
                     photoElement.className = 'rounded-lg overflow-hidden';
                     photoElement.innerHTML = `
