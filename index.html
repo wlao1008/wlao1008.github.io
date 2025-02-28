@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
 
 
     <style>
@@ -21,6 +23,18 @@
             /* 为顶部导航栏留出空间 */
             position: relative;
         }
+
+        .like-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        .like-btn:hover {
+            transform: scale(1.2);
+        }
+
         
         .nav-bar {
             position: fixed;
@@ -320,6 +334,27 @@
                 <!-- 见面日期将显示在这里 -->
             </div>
 
+            <div class="glass-card rounded-3xl p-8 mb-10">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">我们的留言板</h2>
+                <div id="messageBoard" class="space-y-4"></div>
+                <form id="messageForm" class="mt-6">
+                    <textarea id="messageText" class="w-full px-6 py-4 rounded-2xl form-input" placeholder="写下你的留言..." required></textarea>
+                    <button type="submit" class="submit-btn w-full text-white py-4 px-8 rounded-2xl text-xl font-bold shadow-lg mt-4">发送</button>
+                </form>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 mb-10">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">我们的照片墙</h2>
+                <div id="photoWall" class="grid grid-cols-3 gap-4"></div>
+                <form id="photoForm" class="mt-6">
+                    <input type="file" id="photoInput" accept="image/*" class="mb-4 text-white">
+                    <textarea id="photoDesc" class="w-full px-6 py-4 rounded-2xl form-input" placeholder="照片描述..."></textarea>
+                    <button type="submit" class="submit-btn w-full text-white py-4 px-8 rounded-2xl text-xl font-bold shadow-lg mt-4">上传</button>
+                </form>
+            </div>
+
+
+
         </div>
 
         <div class="flex flex-col md:flex-row gap-16 items-start justify-center">
@@ -575,6 +610,83 @@
             }, 3001);
         }
 
+        // 显示留言
+        firebase.database().ref('messages').on('value', snapshot => {
+            const messageBoard = document.getElementById('messageBoard');
+            messageBoard.innerHTML = '';
+            const messages = snapshot.val();
+            if (messages) {
+                Object.values(messages).reverse().forEach(msg => {
+                    const msgElement = document.createElement('div');
+                    msgElement.className = 'p-4 bg-white bg-opacity-20 rounded-lg';
+                    msgElement.innerHTML = `<p class="text-white">${msg.date}: ${msg.text} - <strong>${msg.author}</strong></p>`;
+                    messageBoard.appendChild(msgElement);
+                });
+            }
+        });
+        
+        // 发送留言
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!isLoggedIn) return alert('请先登录！');
+            const text = document.getElementById('messageText').value.trim();
+            if (text) {
+                const newMessage = {
+                    text,
+                    date: new Date().toLocaleString(),
+                    author: '她' // 可根据登录用户动态设置
+                };
+                firebase.database().ref('messages').push(newMessage)
+                    .then(() => document.getElementById('messageText').value = '')
+                    .catch(err => alert('发送失败：' + err.message));
+            }
+        });
+
+        // 显示照片
+        firebase.database().ref('photos').on('value', snapshot => {
+            const photoWall = document.getElementById('photoWall');
+            photoWall.innerHTML = '';
+            const photos = snapshot.val();
+            if (photos) {
+                Object.values(photos).forEach(photo => {
+                    const photoElement = document.createElement('div');
+                    photoElement.className = 'rounded-lg overflow-hidden';
+                    photoElement.innerHTML = `
+                        <img src="${photo.url}" class="w-full h-32 object-cover">
+                        <p class="text-white text-sm mt-2">${photo.description}</p>
+                    `;
+                    photoWall.appendChild(photoElement);
+                });
+            }
+        });
+        
+        // 上传照片
+        document.getElementById('photoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!isLoggedIn) return alert('请先登录！');
+            const file = document.getElementById('photoInput').files[0];
+            const description = document.getElementById('photoDesc').value.trim();
+            if (file) {
+                const storageRef = firebase.storage().ref('photos/' + file.name);
+                storageRef.put(file).then(snapshot => {
+                    snapshot.ref.getDownloadURL().then(url => {
+                        const newPhoto = {
+                            url,
+                            description,
+                            date: new Date().toLocaleString()
+                        };
+                        firebase.database().ref('photos').push(newPhoto)
+                            .then(() => {
+                                document.getElementById('photoInput').value = '';
+                                document.getElementById('photoDesc').value = '';
+                            })
+                            .catch(err => alert('上传失败：' + err.message));
+                    });
+                }).catch(err => alert('上传失败：' + err.message));
+            }
+        });
+
+        
         // 许愿功能
        document.getElementById('wishForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -682,7 +794,7 @@
         // 页面加载时初始化
         initializePage();
 
-        function addWishCard(wish) {
+        function addWishCard(wish, wishId) {  // 添加 wishId 参数
             const wishHistory = document.getElementById('wishHistory');
             const card = document.createElement('div');
             card.className = 'wish-card rounded-2xl p-8 mb-4 shadow-lg';
@@ -694,9 +806,11 @@
                     </span>
                 </div>
                 <p class="text-white text-lg">${wish.text}</p>
+                <button class="like-btn mt-4 text-white" onclick="likeWish('${wishId}')">❤️ ${wish.likes || 0}</button>
             `;
             wishHistory.insertBefore(card, wishHistory.firstChild);
         }
+
 
         // 修改告白消息数组
         const loveMessages = [
@@ -825,12 +939,20 @@
                 wishHistory.innerHTML = ''; // 清空现有卡片
                 const wishes = snapshot.val();
                 if (wishes) {
-                    Object.values(wishes).reverse().forEach((wish) => {
-                        addWishCard(wish);
+                    Object.entries(wishes).reverse().forEach(([wishId, wish]) => {  // 使用 Object.entries 获取 wishId
+                        addWishCard(wish, wishId);
                     });
                 }
             });
         }
+
+
+        function likeWish(wishId) {
+            if (!isLoggedIn) return alert('请先登录！');
+            firebase.database().ref(`wishes/${wishId}/likes`).transaction(likes => (likes || 0) + 1)
+                .catch(err => alert('点赞失败：' + err.message));
+        }
+
 
 
         // 点击“想见我”按钮存储日期
