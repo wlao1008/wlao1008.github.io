@@ -446,9 +446,22 @@
         };
         
         // GitHub API 配置
-        const githubToken = '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';
+        let githubToken = '';
         const repo = 'wlao1008/wlao1008.github.io';
         const folder = 'images';
+
+        // 读取 GitHub token 从 Firebase
+        function getGithubToken() {
+            firebase.database().ref('config/githubToken').once('value')
+                .then((snapshot) => {
+                    const token = snapshot.val();
+                    console.log('读取到的 GitHub Token:', token);
+                    githubToken = token;
+                })
+                .catch((error) => {
+                    console.error('读取 GitHub Token 失败:', error);
+                });
+        }
         
         // 初始化 Firebase
         firebase.initializeApp(firebaseConfig);
@@ -850,6 +863,7 @@
             initializeLoveModal();
             updateSpecialDates();
             displayMeetingDates();
+            getGithubToken();
         }
 
 
