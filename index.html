@@ -507,31 +507,38 @@
         function updateLoginStatus() {
             const loginBtn = document.getElementById('loginBtn');
             if (isLoggedIn) {
-                loginBtn.textContent = '欢迎您，毛毛酱🫰';
+                loginBtn.textContent = '欢迎您，毛毛酱/小阿捞🫰';
             } else {
                 loginBtn.textContent = '登录';
             }
         }
 
-        // 登录/退出功能
         document.getElementById('loginBtn').addEventListener('click', function() {
             if (isLoggedIn) {
                 isLoggedIn = false;
                 localStorage.setItem('isLoggedIn', 'false');
+                localStorage.removeItem('userIdentity');
                 updateLoginStatus();
                 return;
             }
-
+        
             const password = prompt('请输入登录密码：');
-            if (password === '19941008') { // 这里设置您的登录密码
-                isLoggedIn = true;
-                localStorage.setItem('isLoggedIn', 'true');
-                alert('登录成功！');
-                updateLoginStatus();
+            let identity = '';
+            if (password === '19941008') {
+                identity = '小毛毛';
+            } else if (password === '19990804') { // 为“小阿捞”设置一个不同的密码
+                identity = '小阿捞';
             } else {
                 alert('密码错误！');
+                return;
             }
+            isLoggedIn = true;
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userIdentity', identity); // 存储用户身份
+            alert('登录成功！欢迎 ' + identity);
+            updateLoginStatus();
         });
+
 
         // 计算恋爱天数
         function calculateLoveDays() {
@@ -624,23 +631,26 @@
                 });
             }
         });
+
         
         // 发送留言
         document.getElementById('messageForm').addEventListener('submit', function(e) {
             e.preventDefault();
             if (!isLoggedIn) return alert('请先登录！');
             const text = document.getElementById('messageText').value.trim();
+            const identity = localStorage.getItem('userIdentity') || '匿名'; // 从 localStorage 获取身份
             if (text) {
                 const newMessage = {
                     text,
                     date: new Date().toLocaleString(),
-                    author: '她' // 可根据登录用户动态设置
+                    author: identity
                 };
                 firebase.database().ref('messages').push(newMessage)
                     .then(() => document.getElementById('messageText').value = '')
                     .catch(err => alert('发送失败：' + err.message));
             }
         });
+
 
         // 显示照片
         firebase.database().ref('photos').on('value', snapshot => {
