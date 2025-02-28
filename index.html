@@ -677,16 +677,20 @@
             photoWall.innerHTML = '';
             if (photos) {
                 Object.values(photos).forEach(photo => {
+                    // 对 URL 进行 URL 编码
+                    const encodedUrl = encodeURIComponent(photo.url);
+        
                     const photoElement = document.createElement('div');
                     photoElement.className = 'rounded-lg overflow-hidden';
                     photoElement.innerHTML = `
-                        <img src="${photo.url}" class="w-full h-32 object-cover">
+                        <img src="${encodedUrl}" class="w-full h-32 object-cover">
                         <p class="text-white text-sm mt-2">${photo.description}</p>
                     `;
                     photoWall.appendChild(photoElement);
                 });
             }
         }
+
     
         // 监听 Firebase 中的照片数据（保持不变）
         firebase.database().ref('photos').on('value', snapshot => {
