@@ -100,16 +100,19 @@
         
         #messageText {
             resize: none;
+            width: 100%;
             min-height: 120px;
             max-height: 300px;
-            width: 100%;
             padding: 1.2rem;
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.4);
             color: white;
             font-size: 1rem;
+            box-sizing: border-box;
             transition: border 0.3s ease;
+            overflow-y: auto; /* 防止内容溢出 */
+            max-width: 100%;
         }
         
         #messageText::placeholder {
@@ -121,7 +124,7 @@
             border: 1px solid #0088ff;
         }
         
-        /* 提交按钮的样式 */
+        /* 提交按钮样式 */
         .submit-btn {
             padding: 1rem 2rem;
             border-radius: 12px;
@@ -135,25 +138,19 @@
             width: max-content;
         }
         
+        /* 提交按钮悬停效果 */
         .submit-btn:hover {
             background: linear-gradient(145deg, #0066cc, #0088ff);
             transform: translateY(-3px);
         }
         
+        /* 提交按钮点击效果 */
         .submit-btn:active {
             transform: translateY(2px);
         }
         
         /* 响应式设计 */
         @media screen and (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-        
-            #photoWall {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
-        
             #messageText {
                 min-height: 150px;
             }
