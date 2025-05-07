@@ -1110,7 +1110,7 @@
         // 计算离见面还剩多少天
         function getDaysUntilMeeting() {
             const today = new Date();
-            const timeDiff = meetingDate - today;
+            const timeDiff = window.meetingDate - today;
             return Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // 转换为天数
         }
     
