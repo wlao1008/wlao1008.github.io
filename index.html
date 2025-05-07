@@ -633,9 +633,6 @@
             // 可以继续添加其他节日...
         };
 
-    
-        // 设置见面日期
-        const meetingDate = new Date('2025-02-21'); // 见面的日期（例如2025年3月1日）
         
         // 初始化数据
         let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -1209,7 +1206,10 @@
                 const dates = snapshot.val();
                 if (dates && Object.values(dates).length > 0) {
                     const dateList = Object.values(dates).map(date => new Date(date).toLocaleDateString('zh-CN'));
-                    let meetingDate = dateList;
+                    // 更新全局 meetingDate 变量为最早的见面日期
+                    const allDates = Object.values(dates).map(date => new Date(date));
+                    window.meetingDate = new Date(Math.min(...allDates));
+                    updateSpecialDates(); // 更新见面倒计时显示
                     meetingDatesDiv.innerHTML = '我们计划见面的日期：<br>' + dateList.join('<br>');
                 } else {
                     meetingDatesDiv.innerHTML = '毛毛现在不需要海底捞噢 ❤️';
