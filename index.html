@@ -1209,6 +1209,7 @@
                 const dates = snapshot.val();
                 if (dates && Object.values(dates).length > 0) {
                     const dateList = Object.values(dates).map(date => new Date(date).toLocaleDateString('zh-CN'));
+                    let meetingDate = dateList;
                     meetingDatesDiv.innerHTML = '我们计划见面的日期：<br>' + dateList.join('<br>');
                 } else {
                     meetingDatesDiv.innerHTML = '毛毛现在不需要海底捞噢 ❤️';
